@@ -18,6 +18,16 @@ typedef struct {
 }
 Team;
 
+typedef struct{
+    int matchDay;
+    Team *host;
+    Team *guest;
+    int hostScore;
+    int guestScore;
+}
+Match;
+
+
 int initTeams(Team teams[32]){
     FILE *file = fopen("teams.txt", "r");
     int i=0, lines=0;
@@ -185,6 +195,38 @@ fclose(file);
 return &teams[i];
 }
 
+
+Match* storeResult(Team *host, Team *guest){
+    char host_team[20], host_city[20], guest_team[20], guest_city[20];
+    int goals_host=0, goals_guest=0, matchdate=0;
+
+    FILE* file = fopen("match-results.txt", "r");
+    char c;
+
+    while((c = fgetc(file)) != EOF){
+        fscanf(file, "%d %s %s %d %d %s %s", &matchdate, host_team, host_city, &goals_host, &goals_guest, guest_team, guest_city);
+            if ((compare_char_arrays(guest_team, guest->name) == 1) && 
+                (compare_char_arrays(host_team, host->name) == 1)){
+                    Match *matches = (Match*)malloc(sizeof(matches));
+                    if(matches==NULL){
+                        return 1;
+                    }
+
+                    (*matches).matchDay=matchdate;
+                    (*matches).guest=guest_team;
+                    (*matches).host=host_team;
+                    (*matches).guestScore=goals_guest;
+                    (*matches).hostScore=goals_host;
+                    return matches;
+            }
+            
+     
+        }
+    return NULL;
+}
+
+
+
 int main(void){
     
     char firstName[] = "Assel";
@@ -193,8 +235,8 @@ int main(void){
     printf("Student: %s %s\n\n", firstName, lastName);
     Team teams[32];
     //
-    //TASK 1
     //
+    //TASK 1
     int i = initTeams(teams);
     printf("The number of entries stored in array is %d\n", i);
     //Testing the initTeams function - outputs the list of teams
@@ -212,7 +254,19 @@ int main(void){
     char fileName[20];
     printf("\nInput file name\n");
     scanf("%s", fileName); //user writes the name of the file
-    Team * tms = printStandings(i, teams, fileName);
+    Team * tms = (Team*)malloc(sizeof(Team));
+    tms = printStandings(i, teams, fileName);
+    //
+    //
+    //TASK 4
+    Match *matches;
+    //testing the function storeResult()
+    matches=storeResult(&tms[2], &tms[5]);
+    for(int j=0; j<sizeof(matches); j++){
+        printf("%d %s %s %d %d\n", *matches.matchDay, *matches.tms.host, *matches.tms.guest, *matches.hostScore, *matches.guestScore);
+    }
+
+
 
     return 0;
 }
