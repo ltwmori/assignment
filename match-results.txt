@@ -1,0 +1,4 @@
+7 Astana Nur-Sultan 3 0 Atyrau Atyrau
+8 Irtysh Pavlodar 0 1 Astana    Nur-Sultan
+    7 Kairat Almaty 2 1 Tobol   Kostanay
+7 Kaisar Kyzylorda 1 1 Aktobe Aktobe
