@@ -59,8 +59,6 @@ int compare_char_arrays(char s1[], char s2[]) { //function to compare arrays
 
 int addResults(int n, Team teams[32]){
     FILE *file=fopen("match-results.txt", "r");
-    //Team host[32];
-    //Team guest[32];
     int i=0, match_date=0;
     char host_team[20], host_city[20], guest_team[20], guest_city[20];
     int goals_host=0, goals_guest=0;
@@ -78,22 +76,25 @@ int addResults(int n, Team teams[32]){
 
     while(i<=lines){
         fscanf(file, "%d %s %s %d %d %s %s", &match_date, host_team, host_city, &goals_host, &goals_guest, guest_team, guest_city);
-        int count=0;
+        int count=0; //counter for host team (array)
         _Bool find_num_of_array_host=0;
         _Bool find_num_of_array_guest=0;
-        for (count=0; count<n; count++){
+        while (count<n){
             if ((compare_char_arrays(host_team, teams[count].name) == 1) && 
                 (compare_char_arrays(host_city, teams[count].city) == 1)){
                     find_num_of_array_host=1;
+                    break;
             }
+        count++;
         }
-        int count2=0;
-        for(count2=0; count2<n; count2++){
+        int count2=0; //counter for guest team 
+        while(count2<n){
             if ((compare_char_arrays(guest_team, teams[count2].name) == 1) && 
                 (compare_char_arrays(guest_city, teams[count2].city) == 1)){
                     find_num_of_array_guest=1;
                     break; 
             }
+        count2++;
         }
         
         if(find_num_of_array_host==1 && find_num_of_array_guest==1){
