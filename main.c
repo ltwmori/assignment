@@ -148,7 +148,8 @@ Team* printStandings(int n, Team teams[32], char fileName[20]){
     int i=0;
     int goal_diff=0, max_goal_diff=0;
     int max_goals=0;
-    int num_teams_max_points=0; //number of teams with maximum number of points
+    int num_teams_max_points=0;
+    int num_teams_max_goal=0; //number of teams with maximum number of points
     for(i=0; i<n; i++){
         goal_diff=teams[i].goalFor-teams[i].goalAgainst;
         fprintf(file,"%-10s\t\t %d\t\t %d\t\t %d\t\t %+d\n" , teams[i].name, teams[i].points, teams[i].goalFor, teams[i].goalAgainst, goal_diff);
@@ -171,18 +172,21 @@ Team* printStandings(int n, Team teams[32], char fileName[20]){
         if(teams[i].points==max_points){
         num_teams_max_points++;
         }
+        if((teams[i].goalFor-teams[i].goalAgainst)==max_goal_diff){
+            num_teams_max_goal++;
+        }
+    }
+
+    for(int i=0; i<n; i++) {
         if(num_teams_max_points>1){
-            if((teams[i].goalFor-teams[i].goalAgainst)==max_goal_diff){
-                if(teams[i].goalFor==max_goals){
+            if(((num_teams_max_goal>1) && (teams[i].goalFor==max_goals)) ||(num_teams_max_goal==1)){
                     return &teams[i];
                     break;
-                }
-                else {
-                    return NULL;
-                    break;
-                }
             }
-            
+            else {
+                return NULL;
+                break;
+            }
         }
         else if (num_teams_max_points==1) {
             return &teams[i];
@@ -191,10 +195,9 @@ Team* printStandings(int n, Team teams[32], char fileName[20]){
     }
 
 
-fclose(file);      
+fclose(file); 
 return &teams[i];
 }
-
 
 Match* storeResult(Team *host, Team *guest){
     char host_team[20], host_city[20], guest_team[20], guest_city[20];
@@ -202,27 +205,31 @@ Match* storeResult(Team *host, Team *guest){
 
     FILE* file = fopen("match-results.txt", "r");
     char c;
-
+Match *matches = (Match*)malloc(sizeof(matches)); 
     while((c = fgetc(file)) != EOF){
+      
         fscanf(file, "%d %s %s %d %d %s %s", &matchdate, host_team, host_city, &goals_host, &goals_guest, guest_team, guest_city);
+        
             if ((compare_char_arrays(guest_team, guest->name) == 1) && 
                 (compare_char_arrays(host_team, host->name) == 1)){
-                    Match *matches = (Match*)malloc(sizeof(matches));
+                   
+                     
                     if(matches==NULL){
-                        return 1;
+                      return NULL;
                     }
-
-                    (*matches).matchDay=matchdate;
-                    (*matches).guest=guest_team;
-                    (*matches).host=host_team;
-                    (*matches).guestScore=goals_guest;
-                    (*matches).hostScore=goals_host;
-                    return matches;
+                    else{
+                      (*matches).matchDay=matchdate;
+                      strcpy(matches->guest->name, guest_team);
+                      strcpy(matches->host->name, host_team);
+                      (*matches).guestScore=goals_guest;
+                      (*matches).hostScore=goals_host;
+                      return matches;
+                    }
             }
             
      
         }
-    return NULL;
+    return matches;
 }
 
 
@@ -254,18 +261,18 @@ int main(void){
     char fileName[20];
     printf("\nInput file name\n");
     scanf("%s", fileName); //user writes the name of the file
-    Team * tms = (Team*)malloc(sizeof(Team));
+    Team * tms;
     tms = printStandings(i, teams, fileName);
     //
     //
     //TASK 4
-    Match *matches;
+    Match *matches_from_file;
     //testing the function storeResult()
-    matches=storeResult(&tms[2], &tms[5]);
-    for(int j=0; j<sizeof(matches); j++){
-        printf("%d %s %s %d %d\n", *matches.matchDay, *matches.tms.host, *matches.tms.guest, *matches.hostScore, *matches.guestScore);
-    }
-
+    matches_from_file=storeResult(&tms[3], &tms[4]);
+    printf("printing the values were sizeof\n");
+    printf("%d %s %s %d %d\n", matches_from_file->matchDay, matches_from_file->host->name, matches_from_file->guest->name, matches_from_file->hostScore, matches_from_file->guestScore);
+    
+    free(matches_from_file);
 
 
     return 0;
