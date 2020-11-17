@@ -149,54 +149,63 @@ Team* printStandings(int n, Team teams[32], char fileName[20]){
     int goal_diff=0, max_goal_diff=0;
     int max_goals=0;
     int num_teams_max_points=0;
-    int num_teams_max_goal=0; //number of teams with maximum number of points
+    int num_teams_max_goal_diff=0; //number of teams with maximum number of points
     for(i=0; i<n; i++){
         goal_diff=teams[i].goalFor-teams[i].goalAgainst;
+
         fprintf(file,"%-10s\t\t %d\t\t %d\t\t %d\t\t %+d\n" , teams[i].name, teams[i].points, teams[i].goalFor, teams[i].goalAgainst, goal_diff);
         printf("%-10s\t\t %d\t\t %d\t\t %d\t\t %+d\n" , teams[i].name, teams[i].points, teams[i].goalFor, teams[i].goalAgainst, goal_diff);
 
-        if(teams[i].points>max_points){
+        if(teams[i].points>max_points){ //max points
             max_points=teams[i].points;
         }
 
-        if(goal_diff>max_goal_diff){
+        if(goal_diff>max_goal_diff){ //max goal difference
             max_goal_diff=goal_diff;
         }
 
-        if(teams[i].goalFor>max_goals){
+        if(teams[i].goalFor>max_goals){ //max scored goals
             max_goals=teams[i].goalFor;
         }
     }
-
-    for(int i=0; i<n; i++){
-        if(teams[i].points==max_points){
+printf("max points is %d\n", max_points);
+printf("max goal diff is %d\n", max_goal_diff);
+printf("max scored goals is %d\n", max_goals);
+    for(int k=0; k<n; k++){
+      if(teams[k].points==max_points){
         num_teams_max_points++;
-        }
-        if((teams[i].goalFor-teams[i].goalAgainst)==max_goal_diff){
-            num_teams_max_goal++;
-        }
+      }
+      if((teams[k].goalFor-teams[k].goalAgainst)==max_goal_diff){
+        num_teams_max_goal_diff++;
+      }
     }
 
-    for(int i=0; i<n; i++) {
-        if(num_teams_max_points>1){
-            if(((num_teams_max_goal>1) && (teams[i].goalFor==max_goals)) ||(num_teams_max_goal==1)){
-                    return &teams[i];
-                    break;
-            }
-            else {
-                return NULL;
-                break;
-            }
-        }
-        else if (num_teams_max_points==1) {
-            return &teams[i];
+    printf("number of teams with the same max points is %d", num_teams_max_points++);
+    printf("number of teams with the same max goal diss is %d", num_teams_max_goal_diff);
+    int j=0;
+    while(j<n) {
+      if(num_teams_max_points>1){
+        if(((num_teams_max_goal_diff>1) && (teams[j].goalFor==max_goals)) ||(num_teams_max_goal_diff==1)){
+              
+            return &teams[j];
             break;
         }
+        else {
+            return 0;
+            
+        }
+      }
+      if (num_teams_max_points==1) {
+        return &teams[j];
+          break;
+      }
+
+     j++;
     }
 
 
 fclose(file); 
-return &teams[i];
+return &teams[j];
 }
 
 Match* storeResult(Team *host, Team *guest){
@@ -205,8 +214,9 @@ Match* storeResult(Team *host, Team *guest){
 
     FILE* file = fopen("match-results.txt", "r");
     char c;
-Match *matches = (Match*)malloc(sizeof(matches)); 
-    while((c = fgetc(file)) != EOF){
+    int j=0;
+Match *matches = (Match*)malloc(sizeof(matches[j])); 
+    for(j=0; ((c = fgetc(file)) != EOF); j++){
       
         fscanf(file, "%d %s %s %d %d %s %s", &matchdate, host_team, host_city, &goals_host, &goals_guest, guest_team, guest_city);
         
@@ -218,12 +228,12 @@ Match *matches = (Match*)malloc(sizeof(matches));
                       return NULL;
                     }
                     else{
-                      (*matches).matchDay=matchdate;
+                      (*(matches+j)).matchDay=matchdate;
                       strcpy(matches->guest->name, guest_team);
                       strcpy(matches->host->name, host_team);
-                      (*matches).guestScore=goals_guest;
-                      (*matches).hostScore=goals_host;
-                      return matches;
+                      (*(matches+j)).guestScore=goals_guest;
+                      (*(matches+j)).hostScore=goals_host;
+                      return &matches[j];
                     }
             }
             
@@ -244,6 +254,7 @@ int main(void){
     //
     //
     //TASK 1
+    printf("------Task 1------\n");
     int i = initTeams(teams);
     printf("The number of entries stored in array is %d\n", i);
     //Testing the initTeams function - outputs the list of teams
@@ -252,28 +263,36 @@ int main(void){
     }
     //
     //TASK 2
+    printf("\n------Task 2------\n");
     //Testing addResults function --> outputting the points of each team
     int matches = addResults(i, teams);
     printf("\nThe number of matches processed is %d\n", matches);
     //
     //
     //TASK 3
+    printf("\n------Task 3------\n");
     char fileName[20];
     printf("\nInput file name\n");
     scanf("%s", fileName); //user writes the name of the file
     Team * tms;
     tms = printStandings(i, teams, fileName);
+    printf("\nThe champion team is %s\n", tms->name);
     //
     //
     //TASK 4
+    /*
+    printf("\n------Task 4------\n");
     Match *matches_from_file;
     //testing the function storeResult()
-    matches_from_file=storeResult(&tms[3], &tms[4]);
+    matches_from_file=storeResult(&teams[3], &teams[4]);
     printf("printing the values were sizeof\n");
-    printf("%d %s %s %d %d\n", matches_from_file->matchDay, matches_from_file->host->name, matches_from_file->guest->name, matches_from_file->hostScore, matches_from_file->guestScore);
+    for(int j=0; j<(sizeof(matches_from_file)/sizeof(matches_from_file[0])); j++){
+      printf("%d %s %s %d %d\n", (*(matches_from_file+j)).matchDay, (*(matches_from_file+j)).host->name, (*(matches_from_file+j)).guest->name, (*(matches_from_file+j)).hostScore, (*(matches_from_file+j)).guestScore);
+    }
+    
     
     free(matches_from_file);
-
+*/
 
     return 0;
 }
