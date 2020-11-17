@@ -206,39 +206,28 @@ return &teams[j];
 }
 
 Match* storeResult(Team *host, Team *guest){
-    char host_team[20], host_city[20], guest_team[20], guest_city[20];
-    int goals_host=0, goals_guest=0, matchdate=0;
-
-    FILE* file = fopen("match-results.txt", "r");
-    char c;
-    int j=0;
-Match *matches = (Match*)malloc(sizeof(matches[j])); 
-    for(j=0; ((c = fgetc(file)) != EOF); j++){
-      
-        fscanf(file, "%d %s %s %d %d %s %s", &matchdate, host_team, host_city, &goals_host, &goals_guest, guest_team, guest_city);
-        
-            if ((compare_char_arrays(guest_team, guest->name) == 1) && 
-                (compare_char_arrays(host_team, host->name) == 1)){
-                   
-                     
-                    if(matches==NULL){
-                      return NULL;
-                    }
-                    else{
-                      (*(matches+j)).matchDay=matchdate;
-                      strcpy(matches->guest->name, guest_team);
-                      strcpy(matches->host->name, host_team);
-                      (*(matches+j)).guestScore=goals_guest;
-                      (*(matches+j)).hostScore=goals_host;
-                      return &matches[j];
-                    }
+    char hostname[20], hostcity[20], guestcity[20], guestname[20];
+    int gH, gG, matchday;
+    FILE *file=fopen("match-results.txt", "r");
+    while(!feof(file)){
+        fscanf (file, "%d %s %s %d %d %s %s", &matchday, hostname, hostcity, &gH, &gG, guestname, guestcity);
+        if((!strcmp(hostname, host->name) && !strcmp(guestname, guest->name))){
+            Match *match = (Match*) malloc(sizeof(Match));
+            if(match== NULL){
+                return NULL;
             }
-            
-     
+            match->matchDay=matchday;
+            match->host=host;
+            match->guest=guest;
+            match->hostScore=gH;
+            match->guestScore=gG;
+            return match;
         }
-    return matches;
-}
+    }
 
+    return NULL;
+
+}
 
 
 int main(void){
@@ -279,16 +268,16 @@ int main(void){
     //TASK 4
     
     printf("\n------Task 4------\n");
-    Match *matches_from_file;
+    Match *match;
     //testing the function storeResult()
-    matches_from_file=storeResult(&teams[3], &teams[4]);
+    match=storeResult(&teams[3], &teams[4]);
+    printf("%d %s %s %d %d\n", (*(match)).matchDay, (*(match)).host->name, (*(match)).guest->name, (*(match)).hostScore, (*(match)).guestScore);
+    /*for(int j=0; j<(sizeof(match)/sizeof(match[0])); j++){
+      
+    }*/
     
-    for(int j=0; j<(sizeof(matches_from_file)/sizeof(matches_from_file[0])); j++){
-      printf("%d %s %s %d %d\n", (*(matches_from_file+j)).matchDay, (*(matches_from_file+j)).host->name, (*(matches_from_file+j)).guest->name, (*(matches_from_file+j)).hostScore, (*(matches_from_file+j)).guestScore);
-    }
     
-    
-    free(matches_from_file);
+    free(match);
 
 
     return 0;
