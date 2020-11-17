@@ -168,9 +168,7 @@ Team* printStandings(int n, Team teams[32], char fileName[20]){
             max_goals=teams[i].goalFor;
         }
     }
-printf("max points is %d\n", max_points);
-printf("max goal diff is %d\n", max_goal_diff);
-printf("max scored goals is %d\n", max_goals);
+
     for(int k=0; k<n; k++){
       if(teams[k].points==max_points){
         num_teams_max_points++;
@@ -180,23 +178,22 @@ printf("max scored goals is %d\n", max_goals);
       }
     }
 
-    printf("number of teams with the same max points is %d", num_teams_max_points++);
-    printf("number of teams with the same max goal diss is %d", num_teams_max_goal_diff);
     int j=0;
     while(j<n) {
-      if(num_teams_max_points>1){
-        if(((num_teams_max_goal_diff>1) && (teams[j].goalFor==max_goals)) ||(num_teams_max_goal_diff==1)){
+      if(num_teams_max_points>1 && teams[j].points==max_points){
+        if((num_teams_max_goal_diff>1 && (teams[j].goalFor-teams[j].goalAgainst)==max_goal_diff && teams[j].goalFor==max_goals) ||(num_teams_max_goal_diff==1 && (teams[j].goalFor-teams[j].goalAgainst)==max_goal_diff)){
               
             return &teams[j];
             break;
         }
         else {
-            return 0;
+            return  NULL;
             
         }
       }
-      if (num_teams_max_points==1) {
+      if (num_teams_max_points==1 && teams[j].points==max_points) {
         return &teams[j];
+       
           break;
       }
 
@@ -280,19 +277,19 @@ int main(void){
     //
     //
     //TASK 4
-    /*
+    
     printf("\n------Task 4------\n");
     Match *matches_from_file;
     //testing the function storeResult()
     matches_from_file=storeResult(&teams[3], &teams[4]);
-    printf("printing the values were sizeof\n");
+    
     for(int j=0; j<(sizeof(matches_from_file)/sizeof(matches_from_file[0])); j++){
       printf("%d %s %s %d %d\n", (*(matches_from_file+j)).matchDay, (*(matches_from_file+j)).host->name, (*(matches_from_file+j)).guest->name, (*(matches_from_file+j)).hostScore, (*(matches_from_file+j)).guestScore);
     }
     
     
     free(matches_from_file);
-*/
+
 
     return 0;
 }
