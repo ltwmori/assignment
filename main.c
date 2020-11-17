@@ -206,27 +206,139 @@ return &teams[j];
 }
 
 Match* storeResult(Team *host, Team *guest){
-    char hostname[20], hostcity[20], guestcity[20], guestname[20];
-    int gH, gG, matchday;
-    FILE *file=fopen("match-results.txt", "r");
+    char host_team[20], host_city[20], guest_team[20], guest_city[20];
+    int goals_host=0, goals_guest=0, matchdate=0;
+
+    FILE* file = fopen("match-results.txt", "r");
+    char c;
+    int j=0;
+
     while(!feof(file)){
-        fscanf (file, "%d %s %s %d %d %s %s", &matchday, hostname, hostcity, &gH, &gG, guestname, guestcity);
-        if((!strcmp(hostname, host->name) && !strcmp(guestname, guest->name))){
-            Match *match = (Match*) malloc(sizeof(Match));
-            if(match== NULL){
-                return NULL;
+      
+        fscanf(file, "%d %s %s %d %d %s %s", &matchdate, host_team, host_city, &goals_host, &goals_guest, guest_team, guest_city);
+        
+            if ((compare_char_arrays(guest_team, guest->name) == 1) && 
+                (compare_char_arrays(host_team, host->name) == 1)){
+                   
+                    Match *matches = (Match*)malloc(sizeof(Match));  
+                    if(matches==NULL){
+                      return NULL;
+                    }
+                    else{
+                      matches->matchDay=matchdate;
+                      matches->guest=guest;
+                      matches->host=host;
+                      matches->guestScore=goals_guest;
+                      matches->hostScore=goals_host;
+                      return matches;
+                    }
             }
-            match->matchDay=matchday;
-            match->host=host;
-            match->guest=guest;
-            match->hostScore=gH;
-            match->guestScore=gG;
-            return match;
+            
+     
+        }
+        return NULL;
+        fclose(file);
+}
+
+int comparePoints (const void * a, const void * b)
+{
+    Team *tms_pt1=(Team*)a;
+    Team *tms_pt2=(Team*)b;
+    return -(int)(tms_pt1->points-tms_pt2->points);
+}
+
+int compareScores(const void * a, const void * b){
+    Team *tms_pt1=(Team*)a;
+    Team *tms_pt2=(Team*)b;
+    return -(int)(tms_pt1->goalFor-tms_pt2->goalFor);
+}
+
+int compareGoalDif(const void * a, const void * b){
+    Team *tms_pt1=(Team*)a;
+    Team *tms_pt2=(Team*)b;
+    return -(int)((tms_pt1->goalFor-tms_pt1->goalAgainst)-(tms_pt2->goalFor-tms_pt2->goalAgainst));
+}
+
+int compareStrings(const void * a, const void * b){
+    return strcmp(a, b);
+}
+
+void printOrderedStandings(int n, Team teams[32], char fileName[20]){
+    //check the duplicates in number of points
+    FILE *file;
+    file=fopen(fileName,"w");
+    int i=0, j=0;
+    _Bool dup_points=0;
+    _Bool dup_goalDiff=0;
+    _Bool dup_score=0;
+    
+    
+     //duplicates of points
+    for(i=0; i<n; i++)
+    {
+        for(j=i+1;j<n;j++)
+        {
+            if(teams[i].points==teams[j].points)
+             {
+                dup_points=1;
+                break;
+            }
+        }
+   }
+
+   for(i=0; i<n; i++)
+    {
+        for(j=i+1;j<n;j++)
+        {
+            if((teams[i].goalFor-teams[i].goalAgainst)==(teams[j].goalFor-teams[j].goalAgainst))
+             {
+                dup_goalDiff=1;
+                break;
+            }
+        }
+   }
+
+   for(i=0; i<n; i++)
+    {
+        for(j=i+1;j<n;j++)
+        {
+            if(teams[i].goalFor==teams[j].goalFor)
+             {
+                dup_score=1;
+                break;
+            }
+        }
+   }
+
+    if(dup_points==1){
+        if(dup_goalDiff==1){
+            if(dup_score==1){
+                //sorting by alphabetic order
+                qsort(teams, n, sizeof(Team), compareStrings);
+                
+            }
+            else if(dup_score==0){
+                //sorting by goal scores
+                qsort(teams, n, sizeof(Team), compareScores);
+            }
+        }
+        else if(dup_goalDiff==0){
+            //sorting by goal difference
+            qsort(teams, n, sizeof(Team), compareGoalDif);
         }
     }
+    else if(dup_points==0){
+        //sorting by points
+        qsort(teams, n, sizeof(Team), comparePoints);
+    }
+    int goal_diff=0;
+    for(i=0; i<n; i++){
+        goal_diff=teams[i].goalFor-teams[i].goalAgainst;
 
-    return NULL;
-
+        fprintf(file,"%-10s\t\t %d\t\t %d\t\t %d\t\t %+d\n" , teams[i].name, teams[i].points, teams[i].goalFor, teams[i].goalAgainst, goal_diff);
+        printf("%-10s\t\t %d\t\t %d\t\t %d\t\t %+d\n" , teams[i].name, teams[i].points, teams[i].goalFor, teams[i].goalAgainst, goal_diff);
+    }
+fclose(file);
 }
 
 
@@ -266,19 +378,19 @@ int main(void){
     //
     //
     //TASK 4
-    
     printf("\n------Task 4------\n");
     Match *match;
     //testing the function storeResult()
     match=storeResult(&teams[3], &teams[4]);
-    printf("%d %s %s %d %d\n", (*(match)).matchDay, (*(match)).host->name, (*(match)).guest->name, (*(match)).hostScore, (*(match)).guestScore);
-    /*for(int j=0; j<(sizeof(match)/sizeof(match[0])); j++){
-      
-    }*/
-    
-    
+    int j=0;
+    printf("%d %s %s %d %d\n", (*(match+j)).matchDay, (*(match+j)).host->name, (*(match+j)).guest->name, (*(match+j)).hostScore, (*(match+j)).guestScore);
     free(match);
-
+    //
+    //
+    //TASK 5
+    printf("\n------Task 5------\n");
+    printOrderedStandings(i, teams, fileName);
+    
 
     return 0;
 }
