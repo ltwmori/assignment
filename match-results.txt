@@ -2,3 +2,16 @@
 8 Irtysh Pavlodar 0 1 Astana    Nur-Sultan
     7 Kairat Almaty 2 1 Tobol   Kostanay
 7 Kaisar Kyzylorda 1 1 Aktobe Aktobe
+18 Kaisar Kyzylorda 2 2 Okzhetpes Kokshetau
+1 Shakhter Karagandy 0 6 Okzhetpes Kokshetau
+31 Taraz Taraz 5 5 Irtysh Pavlodar
+29 Taraz Taraz 5 2 Aktobe Aktobe
+2 Kaisar Kyzylorda 5 1 Astana Nur-Sultan
+13 Aktobe Aktobe 6 3 Zhetysu Taldykorgan
+27 Tobol Kostanay 1 6 Ordabasy Shymkent
+15 Tobol Kostanay 6 6 Kairat Almaty
+23 Zhetysu Taldykorgan 6 1 Atyrau Atyrau
+11 Shakhter Karagandy 5 1 Atyrau Atyrau
+9 Atyrau Atyrau 3 3 Astana Nur-Sultan
+30 Astana Nur-Sultan 2 3 Irtysh Pavlodar
+3 Ordabasy Shymkent 6 2 Astana Nur-Sultan

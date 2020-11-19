@@ -43,13 +43,13 @@ int initTeams(Team teams[32]){
 
     file = fopen("teams.txt", "r");
     for(i=0; i<=lines; ++i){
-        fscanf(file, "%s %s", teams[i].name, teams[i].city);
-        teams[i].points=0;
+        fscanf(file, "%s %s", teams[i].name, teams[i].city); 
+        teams[i].points=0; // initialising fields points, goalFor and goalAgainst to 0
         teams[i].goalFor=0;
         teams[i].goalAgainst=0;
     }
     fclose(file);
-    return i;
+    return i; //number of lines = number of teams
 }
 
 
@@ -69,14 +69,14 @@ int compare_char_arrays(char s1[], char s2[]) { //function to compare arrays
 
 int addResults(int n, Team teams[32]){
     FILE *file=fopen("match-results.txt", "r");
-    int i=0, match_date=0;
+    int i=0, match_date=0; //i is a counter
     char host_team[20], host_city[20], guest_team[20], guest_city[20];
     int goals_host=0, goals_guest=0;
-    char c;
+    char c; 
     int lines=0;
     while((c = fgetc(file)) != EOF){
         if (c == '\n') {
-        lines++;
+        lines++; //define number if lines in file "match-result.txt"
       }
     }
 
@@ -91,7 +91,8 @@ int addResults(int n, Team teams[32]){
         _Bool find_num_of_array_guest=0;
         while (count<n){
             if ((compare_char_arrays(host_team, teams[count].name) == 1) && 
-                (compare_char_arrays(host_city, teams[count].city) == 1)){
+                (compare_char_arrays(host_city, teams[count].city) == 1)){//comparing team's name from "match-results.txt" file with team's name from "teams.txt"
+                //we are comparing the values to find where the host team is located in teams array --> to find its unique counter
                     find_num_of_array_host=1;
                     break;
             }
@@ -100,15 +101,15 @@ int addResults(int n, Team teams[32]){
         int count2=0; //counter for guest team 
         while(count2<n){
             if ((compare_char_arrays(guest_team, teams[count2].name) == 1) && 
-                (compare_char_arrays(guest_city, teams[count2].city) == 1)){
-                    find_num_of_array_guest=1;
+                (compare_char_arrays(guest_city, teams[count2].city) == 1)){ //comparing team's name from "match-results.txt" file with team's name from "teams.txt"
+                    find_num_of_array_guest=1; //defining the counter of Guest array, where there is
                     break; 
             }
         count2++;
         }
         
         if(find_num_of_array_host==1 && find_num_of_array_guest==1){
-            if(goals_host > goals_guest){
+            if(goals_host > goals_guest){ //adding points to teams
                 teams[count].points+=3;
                 teams[count].goalFor+=goals_host;
                 teams[count].goalAgainst+=goals_guest;
@@ -136,7 +137,7 @@ int addResults(int n, Team teams[32]){
         
     }
     fclose(file);
-    return i;
+    return i; //number of teams processed
 }
 
 Team* printStandings(int n, Team teams[32], char fileName[20]){
@@ -148,9 +149,10 @@ Team* printStandings(int n, Team teams[32], char fileName[20]){
     int i=0;
     int goal_diff=0, max_goal_diff=0;
     int max_goals=0;
-    int num_teams_max_points=0;
-    int num_teams_max_goal_diff=0; //number of teams with maximum number of points
-    for(i=0; i<n; i++){
+    int num_teams_max_points=0;//number of teams with similar maximum number of points
+    int num_teams_max_goal_diff=0; //number of teams with similar maximum goal difference 
+    for(i=0; i<n; i++){ 
+        //this loop is mainly for printing the table 
         goal_diff=teams[i].goalFor-teams[i].goalAgainst;
 
         fprintf(file,"%-10s\t\t %d\t\t %d\t\t %d\t\t %+d\n" , teams[i].name, teams[i].points, teams[i].goalFor, teams[i].goalAgainst, goal_diff);
@@ -169,7 +171,7 @@ Team* printStandings(int n, Team teams[32], char fileName[20]){
         }
     }
 
-    for(int k=0; k<n; k++){
+    for(int k=0; k<n; k++){ //this loop is for defining number of teams with simialar maximum results
       if(teams[k].points==max_points){
         num_teams_max_points++;
       }
@@ -179,20 +181,20 @@ Team* printStandings(int n, Team teams[32], char fileName[20]){
     }
 
     int j=0;
-    while(j<n) {
+    while(j<n) { //this loop is for defining the chamption team 
       if(num_teams_max_points>1 && teams[j].points==max_points){
         if((num_teams_max_goal_diff>1 && (teams[j].goalFor-teams[j].goalAgainst)==max_goal_diff && teams[j].goalFor==max_goals) ||(num_teams_max_goal_diff==1 && (teams[j].goalFor-teams[j].goalAgainst)==max_goal_diff)){
-              
+            //return a pointer to the single champion team that has maximum goal difference OR  that has max goal scored
             return &teams[j];
             break;
         }
-        else {
-            return  NULL;
+        else { 
+            return  NULL; //it does not suit the criterias above ---> it means there are more than 1 champion team
             
         }
       }
       if (num_teams_max_points==1 && teams[j].points==max_points) {
-        return &teams[j];
+        return &teams[j]; //return a pointer to the single champion team that has maximum number of points
        
           break;
       }
@@ -202,7 +204,7 @@ Team* printStandings(int n, Team teams[32], char fileName[20]){
 
 
 fclose(file); 
-return &teams[j];
+return &teams[j]; //– a pointer to the champion team
 }
 
 Match* storeResult(Team *host, Team *guest){
@@ -213,18 +215,19 @@ Match* storeResult(Team *host, Team *guest){
     char c;
     int j=0;
 
-    while(!feof(file)){
+    do{
       
         fscanf(file, "%d %s %s %d %d %s %s", &matchdate, host_team, host_city, &goals_host, &goals_guest, guest_team, guest_city);
         
             if ((compare_char_arrays(guest_team, guest->name) == 1) && 
                 (compare_char_arrays(host_team, host->name) == 1)){
-                   
+                   //comparing every team's name from "match-results" with name from the struct array 
                     Match *matches = (Match*)malloc(sizeof(Match));  
                     if(matches==NULL){
                       return NULL;
                     }
                     else{
+                        //initializing all the elements of matches to the values of file lines
                       matches->matchDay=matchdate;
                       matches->guest=guest;
                       matches->host=host;
@@ -235,44 +238,46 @@ Match* storeResult(Team *host, Team *guest){
             }
             
      
-        }
+        } while(!feof(file));
         return NULL;
         fclose(file);
 }
 
-int comparePoints (const void * a, const void * b)
+int comparePoints (const void * a, const void * b) //this function is used by qsort to compare points of teams
 {
     Team *tms_pt1=(Team*)a;
     Team *tms_pt2=(Team*)b;
     return -(int)(tms_pt1->points-tms_pt2->points);
 }
 
-int compareScores(const void * a, const void * b){
+int compareScores(const void * a, const void * b){ //this function is used by qsort to compare goals scored of teams
     Team *tms_pt1=(Team*)a;
     Team *tms_pt2=(Team*)b;
     return -(int)(tms_pt1->goalFor-tms_pt2->goalFor);
 }
 
-int compareGoalDif(const void * a, const void * b){
+int compareGoalDif(const void * a, const void * b){ //this function is used by qsort to compare goal differences of teams
     Team *tms_pt1=(Team*)a;
     Team *tms_pt2=(Team*)b;
     return -(int)((tms_pt1->goalFor-tms_pt1->goalAgainst)-(tms_pt2->goalFor-tms_pt2->goalAgainst));
 }
 
-int compareStrings(const void * a, const void * b){
-    return strcmp(a, b);
+int compareStrings(const void * a, const void * b){ //this function is used by qsort to compare strings --> to make them in alphabetic order
+    return -strcmp(a, b);
 }
 
 void printOrderedStandings(int n, Team teams[32], char fileName[20]){
-    //check the duplicates in number of points
     FILE *file;
     file=fopen(fileName,"w");
     int i=0, j=0;
-    _Bool dup_points=0;
-    _Bool dup_goalDiff=0;
-    _Bool dup_score=0;
+    _Bool dup_points=0; //initially there are no duplicates in number of points between teams
+    _Bool dup_goalDiff=0; //no duplicates in goal difference between teams
+    _Bool dup_score=0; //no duplicates in goals scored between teams
     
-    
+    Team sorted[32]; //create new Team struct array 
+    for (int loop=0; loop<n; loop++) {
+        sorted[loop] = teams[loop]; //copy data of teams to
+    }
      //duplicates of points
     for(i=0; i<n; i++)
     {
@@ -313,30 +318,34 @@ void printOrderedStandings(int n, Team teams[32], char fileName[20]){
     if(dup_points==1){
         if(dup_goalDiff==1){
             if(dup_score==1){
-                //sorting by alphabetic order
-                qsort(teams, n, sizeof(Team), compareStrings);
+                //sorting by alphabetic order as it is the last check
+                qsort(sorted, n, sizeof(Team), compareStrings);
+                printf("\nSorted by alphabetic order\n");
+                
                 
             }
             else if(dup_score==0){
-                //sorting by goal scores
-                qsort(teams, n, sizeof(Team), compareScores);
+                //sorting by goal scores as there are not duplications in scores
+                qsort(sorted, n, sizeof(Team), compareScores);
+                printf("\nSorted by goal scores\n");
             }
         }
         else if(dup_goalDiff==0){
-            //sorting by goal difference
-            qsort(teams, n, sizeof(Team), compareGoalDif);
+            //sorting by goal difference as there are not duplicates in goal differences
+            qsort(sorted, n, sizeof(Team), compareGoalDif);
+            printf("\nSorted by goal difference\n");
         }
     }
     else if(dup_points==0){
-        //sorting by points
-        qsort(teams, n, sizeof(Team), comparePoints);
+        //sorting by points as there are not duplicates in points
+        qsort(sorted, n, sizeof(Team), comparePoints);
+        printf("\nSorted by points\n");
     }
     int goal_diff=0;
+    printf("\nTEAM\t\t     P\t\t GF\t\t GA\t\t GD\n");
     for(i=0; i<n; i++){
-        goal_diff=teams[i].goalFor-teams[i].goalAgainst;
-
-        fprintf(file,"%-10s\t\t %d\t\t %d\t\t %d\t\t %+d\n" , teams[i].name, teams[i].points, teams[i].goalFor, teams[i].goalAgainst, goal_diff);
-        printf("%-10s\t\t %d\t\t %d\t\t %d\t\t %+d\n" , teams[i].name, teams[i].points, teams[i].goalFor, teams[i].goalAgainst, goal_diff);
+        goal_diff=sorted[i].goalFor-sorted[i].goalAgainst;
+        printf("%-10s\t\t %d\t\t %d\t\t %d\t\t %+d\n" , sorted[i].name, sorted[i].points, sorted[i].goalFor, sorted[i].goalAgainst, goal_diff);
     }
 fclose(file);
 }
@@ -391,6 +400,7 @@ int main(void){
     printf("\n------Task 5------\n");
     printOrderedStandings(i, teams, fileName);
     
-
+    Team * champ;
+    champ=printStandings(i, teams, fileName);
     return 0;
 }
